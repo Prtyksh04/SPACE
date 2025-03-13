@@ -1,0 +1,120 @@
+/* Ensure the main container takes full viewport height */
+.playground-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; 
+    background-color: #1e1e2e; /* Dark theme */
+    color: white;
+    font-family: "Inter", sans-serif;
+}
+
+/* Container for the editor and file tree */
+.editor-container {
+    flex: 1;
+    display: flex;
+    width: 100%;
+    min-height: 76vh;
+    overflow: hidden;
+}
+
+/* Sidebar that contains the file tree */
+.files {
+    padding: 10px 16px;
+    flex: 1;
+    overflow: auto; /* Prevent layout issues if too many files */
+    background-color: #2a2d3e; /* Dark sidebar */
+    border-right: 2px solid #444; 
+    color: white;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+    font-size: 8px; /* Smaller font size */
+}
+
+/* File tree list with more compact spacing */
+li {
+    list-style: none;
+    line-height: 22px; /* Reduced line-height for tighter spacing */
+    font-size: 13px; /* Smaller text size */
+}
+
+/* File node styling */
+.file-node {
+    cursor: pointer;
+    padding: 6px 10px;  /* Reduced padding for smaller file nodes */
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease-in-out;
+    margin: 4px 0;  /* Reduced margin between items */
+}
+
+/* Hover effect for file nodes */
+.file-node:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Icon for files and folders */
+.file-node::before {
+    content: "📄";
+    margin-right: 8px;
+    font-size: 16px; /* Smaller icons */
+}
+
+.folder-node::before {
+    content: "📂";
+    font-size: 16px; /* Smaller folder icons */
+}
+
+/* Selected file display */
+.selected-file {
+    font-weight: bold;
+    color: #00bfff;
+    margin-bottom: 10px;
+    font-size: 16px; /* Slightly larger for better visibility */
+}
+
+/* Monaco Editor container */
+.editor {
+    flex: 8;
+    min-height: 60vh;
+    width: 100%;
+    padding: 10px;
+    padding: auto;
+    display: flex;
+    flex-direction: column;
+    font-size: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+/* Makes Monaco Editor fit perfectly */
+.monaco-editor {
+    height: 100% !important;
+    width: 100% !important;
+}
+
+/* Terminal container */
+.terminal-container {
+    height: 24vh;
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 12px;
+    overflow-y: scroll;
+    border-radius: 8px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Terminal text styling */
+.terminal-container pre {
+    font-size: 14px;
+    color: #33ff33;
+}
+
+/* Smooth scroll */
+.terminal-container::-webkit-scrollbar {
+    width: 5px;
+}
+
+.terminal-container::-webkit-scrollbar-thumb {
+    background: #444;
+    border-radius: 5px;
+}
