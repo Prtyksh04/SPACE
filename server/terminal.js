@@ -1,5 +1,6 @@
-const pty = require("node-pty");
-const os = require("os");
+import pty from "node-pty";
+import os from "os";
+
 const shell = os.platform() === 'win32' ? 'powershell.exe' : 'bash';
 
 const ptyProcess = pty.spawn(shell, [], {
@@ -10,4 +11,4 @@ const ptyProcess = pty.spawn(shell, [], {
     env: process.env
 });
 
-module.exports = ptyProcess
+export  {ptyProcess};

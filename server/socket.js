@@ -1,11 +1,16 @@
-const { Server: SocketServer } = require('socket.io');
-const chokidar = require('chokidar');
-const { writeFile } = require('./fileManager');
-const ptyProcess = require('./terminal');
+import { Server as SocketServer } from 'socket.io';
+import chokidar from 'chokidar';
+import PQueue from 'p-queue';
+import { writeFile } from './fileManager.js';
+import {ptyProcess} from './terminal.js';
 
-module.exports = function setupSocket(Server) {
+const saveQueue = new PQueue({ concurrency: 1 });
+const pendingSaves = new Map();
+
+export function setupSocket(Server) {
     console.log("Setting up Socket Server");
-    const io = new SocketServer(Server , {
+    
+    const io = new SocketServer(Server, {
         cors: {
             origin: "*",
         }
@@ -24,8 +29,27 @@ module.exports = function setupSocket(Server) {
         socket.emit('file:refresh');
 
         socket.on('file:change', async ({ path, content }) => {
-            await writeFile(path, content);
-            io.emit("code:update",content);
+            // await writeFile(path, content);
+            socket.broadcast.emit("code:update", { path, content });
+
+            if (pendingSaves.has(path)) {
+                clearTimeout(pendingSaves.get(path));
+            }
+
+            const saveTimeout = setTimeout(async ()=>{
+                await saveQueue.add(async ()=>{
+                    try {
+                        console.log(`Saving file : ${path}`);
+                        await writeFile(path,content);
+                        io.emit('file:saved',{path});
+                    } catch (error) {
+                        console.error("Error saving file : " , error);
+                    }
+                })
+
+                pendingSaves.delete(path);
+            } , 5000);
+            pendingSaves.set(path,saveTimeout);
         });
 
         socket.on('terminal:write', (data) => {

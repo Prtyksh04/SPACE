@@ -10,7 +10,7 @@ const INSTANCE_URI = "http://localhost:3000/";
 
 function App() {
   const { fileTree, selectedFile, setSelectedFile, code, setCode, getFileTree } = useFileOperations();
-  const [showOutput, setShowOutput] = useState(false);
+  // const [showOutput, setShowOutput] = useState(false);
 
   useSocket(getFileTree, setCode);
 

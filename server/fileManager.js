@@ -1,5 +1,5 @@
-const fs = require("fs");
-const path = require("path");
+import fs from "fs";
+import path from "path";
 
 async function generateFileTree(directory) {
     const tree = {}
@@ -33,4 +33,4 @@ async function writeFile(path,content){
     return fs.promises.writeFile(`./user${path}`,content);
 }
 
-module.exports={generateFileTree,readFile,writeFile};
+export {generateFileTree,readFile,writeFile};

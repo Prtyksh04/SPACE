@@ -8,6 +8,7 @@ export default function useFileOperations() {
     const [selectedFile, setSelectedFile] = useState('');
     const [selectedFileContent, setSelectedFileContent] = useState('');
     const [code, setCode] = useState('');
+    const [isSaving , SetIsSaving] = useState(false);
 
 
     const isSaved = code === selectedFileContent;
@@ -41,11 +42,7 @@ export default function useFileOperations() {
     
     useEffect(()=>{
         if(code && !isSaved){
-            const timer = setTimeout(()=>{
                 socket.emit('file:change',{path : selectedFile , content : code});
-            },5000);
-
-            return ()=>{clearTimeout(timer)};
         }
     });
 
@@ -59,5 +56,17 @@ export default function useFileOperations() {
         setCode('');
     },[selectedFile]);
 
-    return {fileTree , selectedFile , setSelectedFile , code , setCode , isSaved , getFileTree};
+    useEffect(()=>{
+        socket.on('file:saved',({path})=>{
+            if(path === selectedFile){
+                SetIsSaving(false);
+            }
+        });
+
+        return ()=>{
+            socket.off('file:saved');
+        }
+    } , [selectedFile]);
+
+    return {fileTree , selectedFile , setSelectedFile , code , setCode , isSaved , getFileTree , isSaving};
 }

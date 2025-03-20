@@ -1,5 +1,5 @@
-const express = require("express");
-const { generateFileTree, readFile, writeFile } = require('../fileManager');
+import express from "express";
+import { generateFileTree, readFile, writeFile } from "../fileManager.js";
 
 const router = express.Router();
 
@@ -27,4 +27,4 @@ router.get('/files/content', async (req, res) => {
     }
 });
 
-module.exports = router;
+export default router;
