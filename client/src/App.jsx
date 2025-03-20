@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import "./App.css";
 import Terminal from "./components/terminal";
 import FileTreeComponent from "./components/FileTreeComponent";
@@ -12,18 +12,28 @@ function App() {
   const { fileTree, selectedFile, setSelectedFile, code, setCode, getFileTree } = useFileOperations();
   // const [showOutput, setShowOutput] = useState(false);
 
+
+
+  const handleSelect = useCallback((path) => {
+    setSelectedFile(path);
+  }, []);
+
   useSocket(getFileTree, setCode);
 
   useEffect(() => {
     getFileTree();
   }, []);
 
+  const FileTree = useMemo(() =>  <FileTreeComponent fileTree={fileTree} onSelect={handleSelect} /> , [fileTree,handleSelect]);
+
+  const Editor = useMemo(() =>  <EditorComponent selectedFile={selectedFile} code={code} setCode={setCode} /> , [selectedFile, code, setCode]);
+
   return (
     <div className="playground-container">
       {/* Editor & File Tree */}
       <div className="editor-container">
-        <FileTreeComponent fileTree={fileTree} onSelect={setSelectedFile} />
-        <EditorComponent selectedFile={selectedFile} code={code} setCode={setCode} />
+        {FileTree}
+        {Editor}
       </div>
 
       {/* Terminal with Toggle Output Button */}

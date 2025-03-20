@@ -1,3 +1,4 @@
+import { memo } from "react";
 
 const FileTreeNode = ({ FileName, nodes, onSelect, path }) => {
     const isDir = !!nodes;
@@ -32,7 +33,7 @@ const FileTreeNode = ({ FileName, nodes, onSelect, path }) => {
 }
 
 
-const FileTree = ({ tree, onSelect }) => {
+const FileTree = memo(({ tree, onSelect }) => {
     console.log(tree);
     return (
         <FileTreeNode
@@ -42,6 +43,6 @@ const FileTree = ({ tree, onSelect }) => {
             nodes={tree}
         />
     );
-}
+});
 
 export default FileTree;

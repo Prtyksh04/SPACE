@@ -6,7 +6,6 @@ export default function useSocket(getFileTree, setCode) {
     useEffect(() => {
         socket.on('file:refresh', getFileTree);
         socket.on('code:update', (data) => {
-            console.log("Code Update", data);
             setCode(data.content);
         });
 

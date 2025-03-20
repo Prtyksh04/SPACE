@@ -1,5 +1,6 @@
-import { useCallback , useEffect , useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import socket from "../socket";
+import throttle from 'lodash/throttle';
 
 const BASE_URI = 'http://localhost:9000';
 
@@ -8,7 +9,7 @@ export default function useFileOperations() {
     const [selectedFile, setSelectedFile] = useState('');
     const [selectedFileContent, setSelectedFileContent] = useState('');
     const [code, setCode] = useState('');
-    const [isSaving , SetIsSaving] = useState(false);
+    const [isSaving, SetIsSaving] = useState(false);
 
 
     const isSaved = code === selectedFileContent;
@@ -17,9 +18,10 @@ export default function useFileOperations() {
         try {
             const response = await fetch(`${BASE_URI}/files`);
             const result = await response.json();
+            setFileTree(prevTree => { JSON.stringify(prevTree) === JSON.stringify(result.tree) ? prevTree : result.tree });
             setFileTree(result.tree);
         } catch (error) {
-            console.error("Error fetching file tree :" , error);
+            console.error("Error fetching file tree :", error);
         }
     }
 
@@ -30,43 +32,50 @@ export default function useFileOperations() {
             const result = await response.json();
             setSelectedFileContent(result.content);
         } catch (error) {
-            console.error("Error fetching file content :" , error);
+            console.error("Error fetching file content :", error);
         }
-    },[selectedFile]);
+    }, [selectedFile]);
 
-    useEffect(()=>{
-        if(selectedFile){
+    useEffect(() => {
+        if (selectedFile) {
             getFileContent();
         }
-    },[getFileContent,selectedFile]);
-    
-    useEffect(()=>{
-        if(code && !isSaved){
-                socket.emit('file:change',{path : selectedFile , content : code});
+    }, [getFileContent, selectedFile]);
+
+    const sendThrottleUpdate = useCallback(
+        throttle((path,content)=>{
+            socket.emit('file:change',{path,content});
+        },300),
+        []
+    )
+
+    useEffect(() => {
+        if (code && !isSaved) {
+            sendThrottleUpdate(selectedFile, code);
         }
     });
 
-    useEffect(()=>{
-        if(selectedFile && selectedFileContent){
+    useEffect(() => {
+        if (selectedFile && selectedFileContent) {
             setCode(selectedFileContent);
         }
-    },[selectedFile,selectedFileContent]);
+    }, [selectedFile, selectedFileContent]);
 
-    useEffect(()=>{
+    useEffect(() => {
         setCode('');
-    },[selectedFile]);
+    }, [selectedFile]);
 
-    useEffect(()=>{
-        socket.on('file:saved',({path})=>{
-            if(path === selectedFile){
+    useEffect(() => {
+        socket.on('file:saved', ({ path }) => {
+            if (path === selectedFile) {
                 SetIsSaving(false);
             }
         });
 
-        return ()=>{
+        return () => {
             socket.off('file:saved');
         }
-    } , [selectedFile]);
+    }, [selectedFile]);
 
-    return {fileTree , selectedFile , setSelectedFile , code , setCode , isSaved , getFileTree , isSaving};
+    return { fileTree, selectedFile, setSelectedFile, code, setCode, isSaved, getFileTree, isSaving };
 }
